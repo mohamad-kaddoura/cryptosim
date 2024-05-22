@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding"><!-- this is for removing character encoding error-->
+
+    <meta charset="utf-8" />
+    <title></title>
+    <style type="text/css">
+        canvas {
+            background-color: black;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .canvas-div {
+            width: 100%;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            width: 70%;
+            float: left;
+            z-index: 0;
+        }
+
+        .side-div {
+            background-color: rgb(30 30 30);
+            float: right;
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            border:groove;
+            border-color: dimgrey;
+            width: 30%;
+        }
+        .time-panel {
+            position: relative;
+            width: 100%;
+            height: 2em;
+            background-color: rgb(60 58 77);
+        }
+        .time-button {
+            height: 100%;
+            width: 32.755%;
+            border-width: unset;
+            padding: 0px 0px 0px 0px;
+            margin: 0px 0px 0px 0px;
+            background-color: rgb(25 25 25 / 0.76);
+            color: ghostwhite;
+        }
+        .panel-text{
+            float:left;
+            width: 68%;
+            height: 2em;
+            background-color: black;
+            color: rgb(183 255 192);
+        }
+        .panel-text-button {
+            float: right;
+            width: 30%;
+            height: 100%;
+            background-color: rgb(25 25 25 / 0.76);
+            color: ghostwhite;
+        }
+        .tooltip{
+            position: absolute;
+            background-color: rgb(54 54 54);
+            color: red;
+            width: 6em;
+            padding-left: 8px;
+            padding-right: 8px;
+            height: fit-content();
+            z-index: 2;
+        }
+    </style>
+    <script type='text/javascript' src="jquery.min.js"></script>
+    <script type='text/javascript' src="Script.js"></script>
+</head>
+<body>
+    <div class="canvas-div">
+        <div id="tooltip" class="tooltip" style="visibility:hidden;"></div>
+        <canvas id="canvas" height="1920" width="1080">
+        </canvas>
+    </div>
+    <div class="side-div">
+        <div class="time-panel">
+            <input onclick="setDay()" class="time-button" type="button" value="Day" />
+            <input onclick="setHour()" class="time-button" type="button" value="Hour" />
+            <input onclick="setMinute()" class="time-button" type="button" value="Minute" />
+        </div>
+        <p style="color: rgb(132 132 132); padding-left:5px; font-size: 150%">This reports the last 300 days/hours/minutes</p>
+        <div class="time-panel">
+            <input class="panel-text" type="text" />
+            <input class="panel-text-button" type="button" value="Set percentage" />
+        </div>
+        <div class="time-panel">
+            <input class="panel-text" type="text" />
+            <input class="panel-text-button" type="button" value="Set iterations" />
+        </div>
+        <div class="time-panel">
+            <input class="panel-text-button" style="width: 100%;" type="button" value="Display results" onclick="displayResults()" />
+        </div>
+        <div style="padding-left: 5px; color:white;" id="inputinfo">
+        </div>
+        <div style="padding-left: 5px; color:white;" id="output">
+        </div>
+    </div>
+</body>
+</html>
