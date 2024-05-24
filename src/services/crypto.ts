@@ -1,7 +1,15 @@
 import axios from "axios";
 
-interface GetCryptoDataOptions {
-  accuracy: "1m" | "1h" | "1d";
+export enum CryptoGranularity {
+  one_minute = "1m",
+  five_minute = "5m",
+  fifteen_minute = "15m",
+  one_hour = "1h",
+  one_day = "1d",
+}
+
+export interface GetCryptoDataOptions {
+  granularity: CryptoGranularity;
 }
 
 export async function getCryptoData(options: GetCryptoDataOptions) {
@@ -10,7 +18,9 @@ export async function getCryptoData(options: GetCryptoDataOptions) {
 
   try {
     const res = await axios.get(url, {
-      params: { granularity: options.accuracy },
+      params: {
+        granularity: options.granularity,
+      },
     });
 
     return res.data;
