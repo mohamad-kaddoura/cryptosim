@@ -76,6 +76,9 @@ export default function Graph() {
             {
               type: "time",
               position: "bottom",
+              label: {
+                avoidCollisions: true,
+              },
             },
           ],
         }}

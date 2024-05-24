@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  CircularProgress,
+  FormLabel,
   Grid,
   Input,
   Option,
@@ -14,11 +16,18 @@ import { useGlobalContext } from "../contexts/Global";
 
 export default function SimulationPanel() {
   const { setContext, context } = useGlobalContext();
+  const [pending, setPending] = useState(false);
   const [granularity, setGranularity] = useState<CryptoGranularity>(
     context.granularity
   );
 
   const [startCapital, setStartCapital] = useState(0);
+
+  function handleStartSimulation() {
+    setPending(true);
+    // calculateSimulatedValues(context.data, granularity);
+    setPending(false);
+  }
 
   function handleLoadGraph() {
     setContext({
@@ -53,17 +62,30 @@ export default function SimulationPanel() {
             </Grid>
           </Grid>
         </Box>
+        <FormLabel>Starting Capital</FormLabel>
         <Input
           type="number"
-          value={startCapital}
-          onChange={(e) => setStartCapital(parseFloat(e.target.value))}
+          value={startCapital.toString()}
+          onChange={(e) =>
+            setStartCapital(
+              Number.isNaN(parseFloat(e.target.value))
+                ? 0
+                : parseFloat(e.target.value)
+            )
+          }
         />
         <Button onClick={handleLoadGraph}>Load Graph</Button>
 
         <Typography fontWeight="bold">
-          Start Capital: {startCapital} USD
+          Start Capital: {startCapital.toFixed(2)} USD
         </Typography>
-        <Button color="success">Start</Button>
+        <Button
+          color="success"
+          disabled={pending}
+          onClick={handleStartSimulation}
+        >
+          {pending ? <CircularProgress /> : "Start"}
+        </Button>
       </Stack>
     </Box>
   );
