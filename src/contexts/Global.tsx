@@ -1,6 +1,6 @@
 import { createContext, useReducer, useContext } from "react";
 
-import { CryptoGranularity } from "../services/crypto";
+import { CryptoCoin, CryptoGranularity } from "../services/crypto";
 
 export interface CandleData {
   time: number;
@@ -13,11 +13,13 @@ export interface CandleData {
 }
 
 interface GlobalContext {
+  coin: CryptoCoin;
   granularity: CryptoGranularity;
   data: CandleData[];
 }
 
 export const globalObject: GlobalContext = {
+  coin: CryptoCoin.BTC,
   granularity: CryptoGranularity.one_day,
   data: [],
 };

@@ -8,12 +8,21 @@ export enum CryptoGranularity {
   one_day = "1d",
 }
 
+export enum CryptoCoin {
+  BTC = "BTC",
+  ETH = "ETH",
+  SOL = "SOL",
+  ICP = "ICP",
+  SHIB = "SHIB",
+}
+
 export interface GetCryptoDataOptions {
+  coin: CryptoCoin;
   granularity: CryptoGranularity;
 }
 
 export async function getCryptoData(options: GetCryptoDataOptions) {
-  const conversion = "BTC-USD";
+  const conversion = `${options.coin}-USD`;
   const url = `https://api.pro.coinbase.com/products/${conversion}/candles`;
 
   try {

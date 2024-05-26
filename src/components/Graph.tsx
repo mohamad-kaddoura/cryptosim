@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { CryptoGranularity, getCryptoData } from "../services/crypto";
+import { useEffect } from "react";
+import { getCryptoData } from "../services/crypto";
 import { Box } from "@mui/joy";
 import { AgChartsReact } from "ag-charts-react";
 import "ag-charts-enterprise";
@@ -11,6 +11,7 @@ export default function Graph() {
   const loadCryptoData = async () => {
     try {
       const res = (await getCryptoData({
+        coin: context.coin,
         granularity: context.granularity,
       })) as Array<Array<number>>;
       const arr: CandleData[] = res.map((arr) => {
@@ -30,14 +31,14 @@ export default function Graph() {
 
   useEffect(() => {
     loadCryptoData();
-  }, [context.granularity]);
+  }, [context.granularity, context.coin]);
 
   return (
     <Box minHeight={100}>
       <AgChartsReact
         options={{
           title: {
-            text: "BTC-USD",
+            text: `${context.coin}-USD`,
           },
           height: 500,
           data: context.data,
