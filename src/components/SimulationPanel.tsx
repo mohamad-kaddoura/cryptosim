@@ -11,12 +11,17 @@ import {
   Typography,
 } from "@mui/joy";
 import { useState } from "react";
-import { CryptoGranularity } from "../services/crypto";
+import { CryptoCoin, CryptoGranularity } from "../services/crypto";
 import { useGlobalContext } from "../contexts/Global";
+import {
+  TradingAlgorithm,
+  calculateSimulatedValues,
+} from "../utils/algorithms";
 
 export default function SimulationPanel() {
   const { setContext, context } = useGlobalContext();
   const [pending, setPending] = useState(false);
+  const [coin, setCoin] = useState(context.coin);
   const [granularity, setGranularity] = useState<CryptoGranularity>(
     context.granularity
   );
@@ -25,13 +30,21 @@ export default function SimulationPanel() {
 
   function handleStartSimulation() {
     setPending(true);
-    // calculateSimulatedValues(context.data, granularity);
+    const decisions = calculateSimulatedValues(
+      context.data.sort((a, b) => (a.time > b.time ? 1 : -1)),
+      granularity,
+      TradingAlgorithm.ALGORITHM_2,
+      startCapital
+    );
+    setContext({ ...context, results: decisions });
     setPending(false);
   }
 
   function handleLoadGraph() {
     setContext({
       ...context,
+      results: [],
+      coin,
       granularity,
     });
   }
@@ -39,6 +52,19 @@ export default function SimulationPanel() {
   return (
     <Box p={2} boxSizing="border-box">
       <Stack spacing={1}>
+        <FormLabel>Starting Capital</FormLabel>
+        <Select
+          value={coin}
+          onChange={(e, value) => setCoin(value as CryptoCoin)}
+        >
+          {Object.keys(CryptoCoin).map((key) => {
+            return (
+              <Option key={key} value={key}>
+                {key}
+              </Option>
+            );
+          })}
+        </Select>
         <Box>
           <Grid container spacing={1}>
             <Grid xs={4} sx={{ display: "flex", alignItems: "center" }}>
