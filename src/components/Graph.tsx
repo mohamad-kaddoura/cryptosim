@@ -22,7 +22,7 @@ export default function Graph() {
           open: arr[3],
           close: arr[4],
           volume: arr[5],
-          average: (arr[4] + arr[3]) / 2,
+          average: (arr[2] + arr[1]) / 2,
         };
       });
       setContext({ ...context, data: arr });

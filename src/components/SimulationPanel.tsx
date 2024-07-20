@@ -33,20 +33,17 @@ export default function SimulationPanel() {
     const decisions = calculateSimulatedValues(
       context.data.sort((a, b) => (a.time > b.time ? 1 : -1)),
       granularity,
-      TradingAlgorithm.ALGORITHM_1,
+      TradingAlgorithm.ALGORITHM_2,
       startCapital
     );
-    decisions.forEach((decision) => {
-      console.log(
-        `Action: ${decision.action}, Time: ${decision.time}, my balance (before: ${decision.transaction.myBalance.before}, after: ${decision.transaction.myBalance.after}), coin balance (before: ${decision.transaction.coinBalance.before}, after: ${decision.transaction.coinBalance.after})`
-      );
-    });
+    setContext({ ...context, results: decisions });
     setPending(false);
   }
 
   function handleLoadGraph() {
     setContext({
       ...context,
+      results: [],
       coin,
       granularity,
     });

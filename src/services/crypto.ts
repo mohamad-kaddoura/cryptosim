@@ -14,6 +14,7 @@ export enum CryptoCoin {
   SOL = "SOL",
   ICP = "ICP",
   SHIB = "SHIB",
+  ADA = "ADA",
 }
 
 export interface GetCryptoDataOptions {

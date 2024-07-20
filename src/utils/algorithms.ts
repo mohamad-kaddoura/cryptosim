@@ -1,4 +1,3 @@
-import { useDebugValue } from "react";
 import { CandleData } from "../contexts/Global";
 import { CryptoGranularity } from "../services/crypto";
 import { average, stdDev } from "./statistics";
@@ -11,12 +10,13 @@ type CryptoAlgorithm = (
 
 export enum TradingAlgorithm {
   ALGORITHM_1,
+  ALGORITHM_2,
 }
 
 export enum TradingAction {
-  SELL, // Sell the coin back to USD
-  BUY, // Buy coin with USD
-  IGNORE, // Do nothng
+  SELL = "Sell", // Sell the coin back to USD
+  BUY = "Buy", // Buy coin with USD
+  IGNORE = "Ignore", // Do nothng
 }
 
 export interface TradingDecision {
@@ -28,6 +28,7 @@ export interface TradingDecision {
 export interface CryptoTransaction {
   startCapital: number;
   change: number; // Gain or Loss since start capital (after - startCapital)
+  rate: number;
   myBalance: {
     before: number;
     after: number;
@@ -48,6 +49,8 @@ export function calculateSimulatedValues(
   console.log(data.length, "candles");
   if (algorithm === TradingAlgorithm.ALGORITHM_1)
     return runAlgorithm(algorithm1, data, granularity, startCapital);
+  if (algorithm === TradingAlgorithm.ALGORITHM_2)
+    return runAlgorithm(algorithm2, data, granularity, startCapital);
   else return [];
 }
 
@@ -84,6 +87,7 @@ function algorithm1(
       transaction: {
         startCapital,
         time,
+        rate,
         coinBalance: {
           before: oldCoinBalance,
           after: coinBalance,
@@ -109,31 +113,13 @@ function algorithm1(
       transaction: {
         startCapital,
         time,
+        rate,
         coinBalance: {
           before: oldCoinBalance,
           after: coinBalance,
         },
         myBalance: {
           before: oldMyBalance,
-          after: myBalance,
-        },
-        change: myBalance - startCapital,
-      },
-    });
-  }
-  function ignore(time: number) {
-    decisions.push({
-      action: TradingAction.BUY,
-      time,
-      transaction: {
-        startCapital,
-        time,
-        coinBalance: {
-          before: coinBalance,
-          after: coinBalance,
-        },
-        myBalance: {
-          before: myBalance,
           after: myBalance,
         },
         change: myBalance - startCapital,
@@ -203,8 +189,6 @@ function algorithm1(
       } else {
         exchangeToCoin(candle.close, candle.time);
       }
-    } else {
-      ignore(candle.time);
     }
     console.log(myBalance);
   });
@@ -244,6 +228,7 @@ function algorithm2(
       transaction: {
         startCapital,
         time,
+        rate,
         coinBalance: {
           before: oldCoinBalance,
           after: coinBalance,
@@ -270,6 +255,7 @@ function algorithm2(
       transaction: {
         startCapital,
         time,
+        rate,
         coinBalance: {
           before: oldCoinBalance,
           after: coinBalance,
@@ -282,28 +268,9 @@ function algorithm2(
       },
     });
   }
-  function ignore(time: number) {
-    decisions.push({
-      action: TradingAction.BUY,
-      time,
-      transaction: {
-        startCapital,
-        time,
-        coinBalance: {
-          before: coinBalance,
-          after: coinBalance,
-        },
-        myBalance: {
-          before: myBalance,
-          after: myBalance,
-        },
-        change: myBalance - startCapital,
-      },
-    });
-  }
-  const N = 50;
+  const N = 20;
   // max - min over N past candles
-  const X = 7;
+  const X = 3;
   const LOSS_THRESHOLD = 0.05; // if the exchange rate reduces by less than 5% sell for safety
   console.log("Starting Balance:", myBalance);
 
@@ -312,8 +279,12 @@ function algorithm2(
     if (i < N) return;
 
     if (stopSellRate > 0 && profitSellRate > 0) {
-      if (candle.close < stopSellRate || candle.average >= profitSellRate) {
-        // sell back to USD if we hit the profit limit or the stop limit
+      // sell back to USD if we hit the profit limit or the stop limit
+      if (candle.low <= stopSellRate) {
+        console.log("Stop Hit");
+        exchangeToUSD(candle.close, candle.time);
+      } else if (candle.close >= profitSellRate) {
+        console.log("Profit Hit");
         exchangeToUSD(candle.close, candle.time);
       }
       return;
@@ -339,11 +310,16 @@ function algorithm2(
         for (let j = firstIndex; j < i; j++) {
           const currentCandle = data[j];
           if (currentCandle.low < min) min = currentCandle.low;
-          if (currentCandle.high < max) max = currentCandle.high;
+          if (currentCandle.high > max) max = currentCandle.high;
         }
+        console.log("Max:", max);
+        console.log("Min:", min);
+
         const difference = (max - min) * 0.618;
         profitSellRate = max + difference; // Sell when this goal is reached
         stopSellRate = candle.close * (1 - LOSS_THRESHOLD);
+        console.log("Profit Sell Rate", profitSellRate);
+        console.log("Stop Sell Rate:", stopSellRate);
         exchangeToCoin(candle.close, candle.time);
       }
     }
